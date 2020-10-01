@@ -85,9 +85,10 @@ def get_translations(structure, structural_type='100'):
         b_projections.append(dot((site_coords - nearest_site), dir_2))
 
     a_translation = min([min(abs(m_dist - abs(p) % m_dist), abs(p) % m_dist) for p in a_projections]) / m_dist
-    b_translation = min([min(abs(m_dist - abs(p) % m_dist), abs(p) % m_dist) for p in b_projections]) / m_dist
     
     if structural_type == '110':
-        b_translation = b_translation / sqrt(2)
+        m_dist = m_dist * sqrt(2)    
+    
+    b_translation = min([min(abs(m_dist - abs(p) % m_dist), abs(p) % m_dist) for p in b_projections]) / m_dist
     
     return sorted([round(a_translation, 2), round(b_translation, 2)])
