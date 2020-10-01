@@ -1,3 +1,4 @@
+from math import sqrt
 from numpy import array, zeros, fill_diagonal, cross, dot
 from numpy.linalg import norm
 from pymatgen import Element
@@ -33,7 +34,9 @@ def adjacency_matrix(structure):
     return array(adj_matrix, dtype=int)
 
 
-def get_translations(structure):
+def get_translations(structure, structural_type='100'):
+    assert structural_type in ['100', '110']
+    
     metal = [Element.from_Z(z).symbol for z in set(structure.atomic_numbers)
              if Element.from_Z(z).is_metal or Element.from_Z(z).is_metalloid]
 
@@ -55,6 +58,12 @@ def get_translations(structure):
 
     first_layer_coords = array([a.coords for a in layers[first_layer_index] if a.specie.symbol == metal[0]])
     second_layer_coords = array([a.coords for a in layers[second_layer_index] if a.specie.symbol == metal[0]])
+    
+    if structural_type == '110':
+        first_layer_coords = first_layer_coords[first_layer_coords[:, c_index].argsort()][:int(
+            first_layer_coords.shape[0] / 2), :]
+        second_layer_coords = second_layer_coords[second_layer_coords[:, c_index].argsort()][:int(
+            second_layer_coords.shape[0] / 2), :]        
 
     a_axis = extended_structure.lattice.matrix[ab_indices][0]
     b_axis = extended_structure.lattice.matrix[ab_indices][1]
@@ -77,5 +86,8 @@ def get_translations(structure):
 
     a_translation = min([min(abs(m_dist - abs(p) % m_dist), abs(p) % m_dist) for p in a_projections]) / m_dist
     b_translation = min([min(abs(m_dist - abs(p) % m_dist), abs(p) % m_dist) for p in b_projections]) / m_dist
+    
+    if structural_type == '110':
+        b_translation = b_translation / sqrt(2)
     
     return sorted([round(a_translation, 2), round(b_translation, 2)])
