@@ -28,6 +28,7 @@ def adjacency_matrix(structure):
                 
             if dist_matrix[i][j] < max_distance:
                 adj_matrix[i][j] = 1
+                adj_matrix[j][i] = 1
 
     fill_diagonal(adj_matrix, 0)
 
